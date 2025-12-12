@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="WeaponSkin.Request.Sql/WeaponSkin.Request.Sql.csproj" />
+  <Project Path="WeaponSkin.Shared/WeaponSkin.Shared.csproj" Id="707ac836-b462-46d6-9363-4ce874ddd8e5" />
+  <Project Path="WeaponSkin/WeaponSkin.csproj" />
+</Solution>

@@ -1,0 +1,13 @@
+{
+    "Database": {
+        // supported types: mysql, postgresql, sqlite, case-insensitive.
+        // note: when using sqlite the rest of the fields are ignored except database
+        "Type": "sqlite",
+        "Host": "localhost",
+        "Port": 3306,
+        // when using sqlite, this is the name of the database file, which is loated at sharp/data/{Database}.db
+        "Database": "weaponskin",
+        "User": "root",
+        "Password": "YOUR_PASSWORD_HERE"
+    }
+}

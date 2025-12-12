@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>WeaponSkin.Request.Sql</AssemblyName>
+		<Version>1.0.0</Version>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ModSharp.Sharp.Shared" Version="*" PrivateAssets="all" />
+		<PackageReference Include="SqlSugarCore" Version="5.1.4.210" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\WeaponSkin.Shared\WeaponSkin.Shared.csproj" />
+	</ItemGroup>
+</Project>
+

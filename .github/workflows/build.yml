@@ -1,0 +1,83 @@
+name: Build and Package
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  release:
+    types: [ created, published ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Publish WeaponSkin
+      run: dotnet publish WeaponSkin/WeaponSkin.csproj --configuration Release --no-restore --output ./output/WeaponSkin
+      
+    - name: Publish WeaponSkin.Request.Sql
+      run: dotnet publish WeaponSkin.Request.Sql/WeaponSkin.Request.Sql.csproj --configuration Release --no-restore --output ./output/WeaponSkin.Request.Sql
+      
+    - name: Publish WeaponSkin.Shared
+      run: dotnet publish WeaponSkin.Shared/WeaponSkin.Shared.csproj --configuration Release --no-restore --output ./output/WeaponSkin.Shared
+      
+    - name: Create sharp directory structure
+      run: |
+        mkdir -p sharp/modules/WeaponSkin
+        mkdir -p sharp/modules/WeaponSkin.Request.Sql
+        mkdir -p sharp/shared/WeaponSkin.Shared
+        mkdir -p sharp/configs
+        
+    - name: Copy WeaponSkin output files
+      run: |
+        cp -r ./output/WeaponSkin/* sharp/modules/WeaponSkin/
+        rm -f sharp/modules/WeaponSkin/WeaponSkin.Shared*
+        
+    - name: Copy WeaponSkin.Request.Sql output files
+      run: |
+        cp -r ./output/WeaponSkin.Request.Sql/* sharp/modules/WeaponSkin.Request.Sql/
+        rm -f sharp/modules/WeaponSkin.Request.Sql/WeaponSkin.Shared*
+        
+    - name: Copy WeaponSkin.Shared output files
+      run: |
+        cp -r ./output/WeaponSkin.Shared/* sharp/shared/WeaponSkin.Shared/
+        
+    - name: Copy configuration file
+      run: |
+        cp configs/weaponskin.jsonc sharp/configs/weaponskin.jsonc
+        
+    - name: Create zip package
+      run: |
+        SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+        cd sharp
+        zip -r ../WeaponSkin-git${SHORT_SHA}.zip .
+        cd ..
+        
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: WeaponSkin-git${{ github.sha }}
+        path: WeaponSkin-git*.zip
+        retention-days: 30
+        
+    - name: Upload to release
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: WeaponSkin-git*.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
