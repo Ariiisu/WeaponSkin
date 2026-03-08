@@ -71,9 +71,9 @@ internal class RequestManager : IRequestManager
 
         var entities = await _db.Queryable<WeaponCosmeticsEntity>()
                                 .Where(x => x.SteamId == steamIdValue)
-                                .Select(entity => MapToWeaponCosmetics(entity)).ToArrayAsync();
+                                .ToArrayAsync();
 
-        return entities;
+        return entities.Select(MapToWeaponCosmetics).ToArray();
     }
 
     public async Task<TeamItem[]> GetPlayerTeamKnives(SteamID steamId)
@@ -82,13 +82,9 @@ internal class RequestManager : IRequestManager
 
         var entities = await _db.Queryable<TeamKnifeEntity>()
                                 .Where(x => x.SteamId == steamIdValue)
-                                .Select(entity => new TeamItem
-                                {
-                                    Team   = (CStrikeTeam) entity.Team,
-                                    ItemId = (EconItemId) entity.ItemId,
-                                }).ToArrayAsync();
+                                .ToArrayAsync();
 
-        return entities;
+        return entities.Select(e => new TeamItem { Team = (CStrikeTeam)e.Team, ItemId = (EconItemId)e.ItemId }).ToArray();
     }
 
     public async Task<TeamItem[]> GetPlayerTeamGloves(SteamID steamId)
@@ -97,13 +93,9 @@ internal class RequestManager : IRequestManager
 
         var entities = await _db.Queryable<TeamGloveEntity>()
                                 .Where(x => x.SteamId == steamIdValue)
-                                .Select(entity => new TeamItem
-                                {
-                                    Team   = (CStrikeTeam) entity.Team,
-                                    ItemId = (EconItemId) entity.ItemId,
-                                }).ToArrayAsync();
+                                .ToArrayAsync();
 
-        return entities;
+        return entities.Select(e => new TeamItem { Team = (CStrikeTeam)e.Team, ItemId = (EconItemId)e.ItemId }).ToArray();
     }
 
     public async Task<TeamItem[]> GetPlayerTeamAgent(SteamID steamId)
@@ -112,13 +104,9 @@ internal class RequestManager : IRequestManager
 
         var entities = await _db.Queryable<TeamAgentEntity>()
                                 .Where(x => x.SteamId == steamIdValue)
-                                .Select(entity => new TeamItem
-                                {
-                                    Team   = (CStrikeTeam) entity.Team,
-                                    ItemId = (EconItemId) entity.ItemId,
-                                }).ToArrayAsync();
+                                .ToArrayAsync();
 
-        return entities;
+        return entities.Select(e => new TeamItem { Team = (CStrikeTeam)e.Team, ItemId = (EconItemId)e.ItemId }).ToArray();
     }
 
     public async Task<TeamItem[]> GetPlayerTeamMusicKits(SteamID steamId)
@@ -127,14 +115,9 @@ internal class RequestManager : IRequestManager
 
         var entities = await _db.Queryable<TeamMusicKitEntity>()
                                 .Where(x => x.SteamId == steamIdValue)
-                                .Select(entity => new TeamItem
-                                {
-                                    Team   = (CStrikeTeam) entity.Team,
-                                    ItemId = (EconItemId) entity.ItemId,
-                                })
                                 .ToArrayAsync();
 
-        return entities;
+        return entities.Select(e => new TeamItem { Team = (CStrikeTeam)e.Team, ItemId = (EconItemId)e.ItemId }).ToArray();
     }
 
     public async Task<TeamItem[]> GetPlayerTeamMedals(SteamID steamId)
@@ -143,14 +126,9 @@ internal class RequestManager : IRequestManager
 
         var entities = await _db.Queryable<TeamMedalEntity>()
                                 .Where(x => x.SteamId == steamIdValue)
-                                .Select(entity => new TeamItem
-                                {
-                                    Team   = (CStrikeTeam) entity.Team,
-                                    ItemId = (EconItemId) entity.ItemId,
-                                })
                                 .ToArrayAsync();
 
-        return entities;
+        return entities.Select(e => new TeamItem { Team = (CStrikeTeam)e.Team, ItemId = (EconItemId)e.ItemId }).ToArray();
     }
 
     private static WeaponCosmetics MapToWeaponCosmetics(WeaponCosmeticsEntity entity)
