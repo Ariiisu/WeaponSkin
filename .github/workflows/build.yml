@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ master ]
   release:
-    types: [ created, published ]
+    types: [ created ]
   workflow_dispatch:
 
 jobs:
@@ -63,21 +63,21 @@ jobs:
       run: |
         SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
         cd sharp
-        zip -r ../WeaponSkin-git${SHORT_SHA}.zip .
+        zip -r ../WeaponSkin-git-${SHORT_SHA}.zip .
         cd ..
         
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: WeaponSkin-git${{ github.sha }}
-        path: WeaponSkin-git*.zip
+        name: WeaponSkin-git-${{ github.sha }}
+        path: WeaponSkin-git-*.zip
         retention-days: 30
         
     - name: Upload to release
       if: github.event_name == 'release'
       uses: softprops/action-gh-release@v1
       with:
-        files: WeaponSkin-git*.zip
+        files: WeaponSkin-git-*.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

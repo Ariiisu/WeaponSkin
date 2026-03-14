@@ -6,8 +6,8 @@ namespace WeaponSkin.Request.Sql.Entities;
 ///     Database entity representing team-specific medal selections
 /// </summary>
 [SugarTable("ws_team_medals")]
-[SugarIndex($"index_{{table}}_{nameof(SteamId)}", nameof(SteamId), OrderByType.Asc)]
-[SugarIndex($"index_{{table}}_{nameof(Team)}",    nameof(Team),    OrderByType.Asc)]
+[SugarIndex($"unique_{{table}}_{nameof(SteamId)}_{nameof(Team)}", 
+    $"{nameof(SteamId)},{nameof(Team)}", OrderByType.Asc, IsUnique = true)]
 public class TeamMedalEntity
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]

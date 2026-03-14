@@ -82,6 +82,11 @@ internal class RequestManager : IRequestManager
 
         var entities = await _db.Queryable<TeamKnifeEntity>()
                                 .Where(x => x.SteamId == steamIdValue)
+                                .Select(x => new
+                                {
+                                    x.Team,
+                                    x.ItemId,
+                                })
                                 .ToArrayAsync();
 
         return entities.Select(e => new TeamItem { Team = (CStrikeTeam)e.Team, ItemId = (EconItemId)e.ItemId }).ToArray();
@@ -93,6 +98,11 @@ internal class RequestManager : IRequestManager
 
         var entities = await _db.Queryable<TeamGloveEntity>()
                                 .Where(x => x.SteamId == steamIdValue)
+                                .Select(x => new
+                                {
+                                    x.Team,
+                                    x.ItemId,
+                                })
                                 .ToArrayAsync();
 
         return entities.Select(e => new TeamItem { Team = (CStrikeTeam)e.Team, ItemId = (EconItemId)e.ItemId }).ToArray();
@@ -104,6 +114,11 @@ internal class RequestManager : IRequestManager
 
         var entities = await _db.Queryable<TeamAgentEntity>()
                                 .Where(x => x.SteamId == steamIdValue)
+                                .Select(x => new
+                                {
+                                    x.Team,
+                                    x.ItemId,
+                                })
                                 .ToArrayAsync();
 
         return entities.Select(e => new TeamItem { Team = (CStrikeTeam)e.Team, ItemId = (EconItemId)e.ItemId }).ToArray();
@@ -115,6 +130,11 @@ internal class RequestManager : IRequestManager
 
         var entities = await _db.Queryable<TeamMusicKitEntity>()
                                 .Where(x => x.SteamId == steamIdValue)
+                                .Select(x => new
+                                {
+                                    x.Team,
+                                    x.ItemId,
+                                })
                                 .ToArrayAsync();
 
         return entities.Select(e => new TeamItem { Team = (CStrikeTeam)e.Team, ItemId = (EconItemId)e.ItemId }).ToArray();
@@ -126,6 +146,11 @@ internal class RequestManager : IRequestManager
 
         var entities = await _db.Queryable<TeamMedalEntity>()
                                 .Where(x => x.SteamId == steamIdValue)
+                                .Select(x => new
+                                {
+                                    x.Team,
+                                    x.ItemId,
+                                })
                                 .ToArrayAsync();
 
         return entities.Select(e => new TeamItem { Team = (CStrikeTeam)e.Team, ItemId = (EconItemId)e.ItemId }).ToArray();
