@@ -2,7 +2,9 @@ using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Sharp.Extensions.CommandManager;
 using Sharp.Shared;
+using Sharp.Shared.Abstractions;
 using WeaponSkin.Managers;
 using WeaponSkin.Modules;
 
@@ -40,11 +42,11 @@ public class WeaponSkin : IModSharpModule
                                                      .HasCommandLine("-debug"));
 
         var services = new ServiceCollection();
-
         services.AddSingleton(bridge);
         services.AddSingleton(factory);
         services.AddSingleton(sharedSystem);
         services.AddLogging();
+        services.AddCommandManager(sharedSystem);
 
         ConfigureServices(services);
 
@@ -105,6 +107,8 @@ public class WeaponSkin : IModSharpModule
             }
         }
 
+        _serviceProvider.LoadAllSharpExtensions();
+
         return true;
     }
 
@@ -133,6 +137,8 @@ public class WeaponSkin : IModSharpModule
                 _logger.LogError(e, "Error when calling Shutdown for {service}", service.GetType().FullName);
             }
         }
+
+        _serviceProvider.ShutdownAllSharpExtensions();
     }
 
     private void ConfigureServices(IServiceCollection services)

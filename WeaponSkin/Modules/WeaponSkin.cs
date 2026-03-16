@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Sharp.Shared.Definition;
 using Sharp.Shared.Enums;
 using Sharp.Shared.GameEntities;
 using Sharp.Shared.GameObjects;
@@ -130,6 +129,11 @@ internal partial class WeaponSkin : IModule
         view.SetItemIdLowLocal(uint.MaxValue);
         view.SetItemIdHighLocal(_itemId++);
 
+        if (!string.IsNullOrEmpty(skin.NameTag))
+        {
+            view.SetCustomNameLocal(skin.NameTag);
+        }
+
         if (skin.StatTrak is { } statTrak)
         {
             view.SetQualityLocal(9);
@@ -148,11 +152,6 @@ internal partial class WeaponSkin : IModule
                 weapon.SetBodyGroupByName("body", 1);
             }
         }
-        else
-        {
-            client.Print(HudPrintChannel.SayText2,
-                         $" [{ChatColor.Green}WS{ChatColor.White}] Invalid paintkit id {skin.PaintId}.");
-        }
 
         for (var i = 0; i < skin.Stickers.Length; i++)
         {
@@ -164,20 +163,20 @@ internal partial class WeaponSkin : IModule
             }
 
             var schema = GetStickerSchema(i);
+            SetOrAddAttribute(view, schema.Id, BitConverter.Int32BitsToSingle(sticker.StickerId));
+            SetOrAddAttribute(view, schema.Wear, sticker.Wear);
 
-            SetOrAddAttribute(view, schema.Id,       sticker.StickerId);
-            SetOrAddAttribute(view, schema.Wear,     sticker.Wear);
-            SetOrAddAttribute(view, schema.Scale,    sticker.Scale);
+            SetOrAddAttribute(view, schema.Scale, sticker.Scale);
             SetOrAddAttribute(view, schema.Rotation, sticker.Rotation);
-            SetOrAddAttribute(view, schema.OffsetX,  sticker.OffsetX);
-            SetOrAddAttribute(view, schema.OffsetY,  sticker.OffsetY);
+            SetOrAddAttribute(view, schema.OffsetX, sticker.OffsetX);
+            SetOrAddAttribute(view, schema.OffsetY, sticker.OffsetY);
         }
 
         if (skin.Keychain is { } keychain)
         {
             var schema = GetKeychainSchema(0);
-            SetOrAddAttribute(view, schema.Id,      keychain.KeychainId);
-            SetOrAddAttribute(view, schema.Seed,    keychain.Seed);
+            SetOrAddAttribute(view, schema.Id, BitConverter.Int32BitsToSingle(keychain.KeychainId));
+            SetOrAddAttribute(view, schema.Seed, keychain.Seed);
             SetOrAddAttribute(view, schema.OffsetX, keychain.X);
             SetOrAddAttribute(view, schema.OffsetY, keychain.Y);
             SetOrAddAttribute(view, schema.OffsetZ, keychain.Z);
@@ -186,7 +185,6 @@ internal partial class WeaponSkin : IModule
 
     private void OnPlayerKilledPost(IPlayerKilledForwardParams @params)
     {
-        var victim       = @params.Pawn;
         var attackerSlot = @params.AttackerPlayerSlot;
 
         if (_bridge.EntityManager.FindEntityByHandle(@params.AttackerPawnHandle) is not { } attackerPawn

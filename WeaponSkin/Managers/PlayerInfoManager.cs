@@ -1,8 +1,11 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
+using Sharp.Extensions.CommandManager;
+using Sharp.Shared.Definition;
 using Sharp.Shared.Enums;
 using Sharp.Shared.Listeners;
 using Sharp.Shared.Objects;
+using Sharp.Shared.Types;
 using Sharp.Shared.Units;
 using WeaponSkin.Shared;
 
@@ -35,6 +38,7 @@ internal class PlayerInfoManager : IPlayerInfoManager, IClientListener, IManager
     private const int TEAM_MAX_COUNT = 2;
 
     private readonly InterfaceBridge            _bridge;
+    private readonly ICommandManager            _commands;
     private readonly ILogger<PlayerInfoManager> _logger;
 
     private readonly EconItemId?[,]      _playerKnives = new EconItemId?[PlayerSlot.MaxPlayerCount, TEAM_MAX_COUNT];
@@ -45,10 +49,11 @@ internal class PlayerInfoManager : IPlayerInfoManager, IClientListener, IManager
     private readonly ushort?[,] _playerMedals    = new ushort?[PlayerSlot.MaxPlayerCount, TEAM_MAX_COUNT];
     private readonly ushort?[,] _playerMusicKits = new ushort?[PlayerSlot.MaxPlayerCount, TEAM_MAX_COUNT];
 
-    public PlayerInfoManager(InterfaceBridge bridge, ILogger<PlayerInfoManager> logger)
+    public PlayerInfoManager(InterfaceBridge bridge, ICommandManager commandManager, ILogger<PlayerInfoManager> logger)
     {
-        _bridge = bridge;
-        _logger = logger;
+        _bridge   = bridge;
+        _commands = commandManager;
+        _logger   = logger;
 
         _weaponCosmetics = Enumerable.Repeat<WeaponCosmetics[]>([], PlayerSlot.MaxPlayerCount).ToArray();
     }
@@ -57,7 +62,14 @@ internal class PlayerInfoManager : IPlayerInfoManager, IClientListener, IManager
     {
         _bridge.ClientManager.InstallClientListener(this);
 
+        _commands.RegisterClientCommand("ws_refresh", OnCommandRefresh);
+
         return true;
+    }
+
+    private void OnCommandRefresh(IGameClient client, StringCommand command)
+    {
+        RefreshInventory(client);
     }
 
     public void Shutdown()
@@ -122,7 +134,7 @@ internal class PlayerInfoManager : IPlayerInfoManager, IClientListener, IManager
             return;
         }
 
-        Task.Run(async () => await GetPlayerInventory(client.SteamId).ConfigureAwait(false));
+        Task.Run(async () => await GetPlayerInventory(client.SteamId, true).ConfigureAwait(false));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -206,7 +218,7 @@ internal class PlayerInfoManager : IPlayerInfoManager, IClientListener, IManager
         }
     }
 
-    private async Task GetPlayerInventory(SteamID steamId)
+    private async Task GetPlayerInventory(SteamID steamId, bool notify = false)
     {
         try
         {
@@ -236,6 +248,12 @@ internal class PlayerInfoManager : IPlayerInfoManager, IClientListener, IManager
                     AssignItems(medals.Result,    _playerMedals,    target.Slot);
                     AssignItems(musicKits.Result, _playerMusicKits, target.Slot);
                     AssignItems(agents.Result,    _playerAgents,    target.Slot);
+
+                    if (notify)
+                    {
+                        target.Print(HudPrintChannel.SayText2,
+                                     $" [{ChatColor.Green}WS{ChatColor.White}] Inventory refreshed.");
+                    }
                 }
             }).ConfigureAwait(false);
         }
