@@ -156,6 +156,17 @@ internal class RequestManager : IRequestManager
         return entities.Select(e => new TeamItem { Team = (CStrikeTeam)e.Team, ItemId = (EconItemId)e.ItemId }).ToArray();
     }
 
+    public async Task UpdateStatTrak(SteamID steamId, EconItemId itemId, int statTrak)
+    {
+        var steamIdValue = (ulong)steamId;
+        var itemIdValue  = (int)itemId;
+
+        await _db.Updateable<WeaponCosmeticsEntity>()
+                 .SetColumns(x => x.StatTrak == statTrak)
+                 .Where(x => x.SteamId == steamIdValue && x.ItemId == itemIdValue)
+                 .ExecuteCommandAsync();
+    }
+
     private static WeaponCosmetics MapToWeaponCosmetics(WeaponCosmeticsEntity entity)
     {
         var stickers = new Sticker?[5];

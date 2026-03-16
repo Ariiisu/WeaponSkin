@@ -32,7 +32,7 @@ public record WeaponCosmetics
     public float Wear { get; init; }
     public float Seed { get; init; }
 
-    public int? StatTrak { get; init; }
+    public int? StatTrak { get; set; }
 
     public string NameTag { get; init; } = string.Empty;
 

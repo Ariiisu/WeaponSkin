@@ -1,4 +1,5 @@
-﻿using Sharp.Shared.Units;
+﻿using Sharp.Shared.Enums;
+using Sharp.Shared.Units;
 
 namespace WeaponSkin.Shared;
 
@@ -16,4 +17,6 @@ public interface IRequestManager
     Task<TeamItem[]> GetPlayerTeamMedals(SteamID steamId);
 
     Task<Dictionary<string, int>> RunMigration();
+
+    Task UpdateStatTrak(SteamID steamId, EconItemId itemId, int statTrak);
 }

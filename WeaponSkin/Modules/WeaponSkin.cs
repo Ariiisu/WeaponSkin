@@ -5,6 +5,7 @@ using Sharp.Shared.GameEntities;
 using Sharp.Shared.GameObjects;
 using Sharp.Shared.HookParams;
 using Sharp.Shared.Types;
+using Sharp.Shared.Units;
 using WeaponSkin.Managers;
 
 namespace WeaponSkin.Modules;
@@ -46,6 +47,7 @@ internal partial class WeaponSkin : IModule
     {
         _bridge.HookManager.GiveNamedItem.InstallHookPre(OnGiveNamedItemPre);
         _bridge.HookManager.GiveNamedItem.InstallHookPost(OnGiveNamedItemPost);
+        _bridge.HookManager.PlayerKilledPost.InstallForward(OnPlayerKilledPost);
 
         return true;
     }
@@ -54,6 +56,7 @@ internal partial class WeaponSkin : IModule
     {
         _bridge.HookManager.GiveNamedItem.RemoveHookPre(OnGiveNamedItemPre);
         _bridge.HookManager.GiveNamedItem.RemoveHookPost(OnGiveNamedItemPost);
+        _bridge.HookManager.PlayerKilledPost.RemoveForward(OnPlayerKilledPost);
     }
 
     private HookReturnValue<IBaseWeapon> OnGiveNamedItemPre(IGiveNamedItemHookParams @params, HookReturnValue<IBaseWeapon> ret)
@@ -123,8 +126,6 @@ internal partial class WeaponSkin : IModule
             return;
         }
 
-        var controller = @params.Controller;
-
         view.SetAccountIdLocal(client.SteamId.AccountId);
         view.SetItemIdLowLocal(uint.MaxValue);
         view.SetItemIdHighLocal(_itemId++);
@@ -139,13 +140,13 @@ internal partial class WeaponSkin : IModule
         if (_bridge.EconItemManager.GetPaintKits().ContainsKey(skin.PaintId))
         {
             SetOrAddAttribute(view, "set item texture prefab"u8, skin.PaintId);
-            SetOrAddAttribute(view, "set item texture wear"u8,   skin.Wear);
-            SetOrAddAttribute(view, "set item texture seed"u8,   skin.Seed);
+            SetOrAddAttribute(view, "set item texture wear"u8, skin.Wear);
+            SetOrAddAttribute(view, "set item texture seed"u8, skin.Seed);
         }
         else
         {
-            controller.Print(HudPrintChannel.SayText2,
-                             $" [{ChatColor.Green}WS{ChatColor.White}] Invalid paintkit id {skin.PaintId}.");
+            client.Print(HudPrintChannel.SayText2,
+                         $" [{ChatColor.Green}WS{ChatColor.White}] Invalid paintkit id {skin.PaintId}.");
         }
 
         for (var i = 0; i < skin.Stickers.Length; i++)
@@ -176,6 +177,64 @@ internal partial class WeaponSkin : IModule
             SetOrAddAttribute(view, schema.OffsetY, keychain.Y);
             SetOrAddAttribute(view, schema.OffsetZ, keychain.Z);
         }
+    }
+
+    private void OnPlayerKilledPost(IPlayerKilledForwardParams @params)
+    {
+        var victim       = @params.Pawn;
+        var attackerSlot = @params.AttackerPlayerSlot;
+
+        if (_bridge.EntityManager.FindEntityByHandle(@params.AttackerPawnHandle) is not { } attackerPawn
+            || !attackerPawn.IsPlayer(true)
+            || attackerSlot < 0
+            || _bridge.ClientManager.GetGameClient((PlayerSlot) attackerSlot) is not { } attackerClient)
+        {
+            return;
+        }
+
+        var attackEntity = _bridge.EntityManager.FindEntityByHandle(@params.AbilityHandle);
+
+        if (attackEntity?.AsBaseWeapon() is not { } weapon)
+        {
+            return;
+        }
+
+        var econItemIndex = (EconItemId) weapon.ItemDefinitionIndex;
+
+        if (_playerInfo.GetPlayerWeaponSkin(attackerClient, econItemIndex) is not { } skin)
+        {
+            return;
+        }
+
+        if (skin.StatTrak is null)
+        {
+            return;
+        }
+
+        var view     = weapon.AttributeContainer.Item;
+        var statTrak = skin.StatTrak.Value + 1;
+
+        skin.StatTrak = statTrak;
+        view.SetQualityLocal(9);
+        SetOrAddAttribute(view, "kill eater"u8, statTrak);
+        SetOrAddAttribute(view, "kill eater score type"u8, 0);
+
+        var steamId = attackerClient.SteamId;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                if (_bridge.GetRequestManager() is { } request)
+                {
+                    await request.UpdateStatTrak(steamId, econItemIndex, statTrak).ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to update StatTrak for {steamId}", steamId);
+            }
+        });
     }
 
     private unsafe void SetOrAddAttribute(IEconItemView view, ReadOnlySpan<byte> name, float value)

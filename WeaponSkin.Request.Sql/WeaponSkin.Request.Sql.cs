@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Sharp.Shared;
+using Sharp.Shared.Enums;
 using Sharp.Shared.Units;
 using SqlSugar;
 using WeaponSkin.Shared;
@@ -224,4 +225,9 @@ public class WeaponSkinRequest : IModSharpModule, IRequestManager
         => _requestManager == null
             ? throw new InvalidOperationException("RequestManager not initialized")
             : _requestManager.RunMigration();
+
+    public Task UpdateStatTrak(SteamID steamId, EconItemId itemId, int statTrak) =>
+        _requestManager == null
+            ? throw new InvalidOperationException("RequestManager not initialized")
+            : _requestManager.UpdateStatTrak(steamId, itemId, statTrak);
 }
