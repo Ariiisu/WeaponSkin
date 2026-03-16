@@ -137,11 +137,16 @@ internal partial class WeaponSkin : IModule
             SetOrAddAttribute(view, "kill eater score type"u8, 0);
         }
 
-        if (_bridge.EconItemManager.GetPaintKits().ContainsKey(skin.PaintId))
+        if (_bridge.EconItemManager.GetPaintKits().TryGetValue(skin.PaintId, out var paintKit))
         {
             SetOrAddAttribute(view, "set item texture prefab"u8, skin.PaintId);
             SetOrAddAttribute(view, "set item texture wear"u8, skin.Wear);
             SetOrAddAttribute(view, "set item texture seed"u8, skin.Seed);
+
+            if (weapon.Slot is GearSlot.Rifle or GearSlot.Pistol && paintKit.IsUseNormalModel)
+            {
+                weapon.SetBodyGroupByName("body", 1);
+            }
         }
         else
         {
