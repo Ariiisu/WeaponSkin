@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<AssemblyName>WeaponSkin</AssemblyName>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -15,7 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\WeaponSkin.Shared\WeaponSkin.Shared.csproj" PrivateAssets="all" />
+	  <ProjectReference Include="..\WeaponSkin.Shared\WeaponSkin.Shared.csproj" Private="false" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 </Project>

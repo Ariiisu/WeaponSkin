@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AssemblyName>WeaponSkin.Request.Sql</AssemblyName>
-		<Version>1.0.2</Version>
+		<Version>1.0.4</Version>
 
 	</PropertyGroup>
 
@@ -18,7 +18,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\WeaponSkin.Shared\WeaponSkin.Shared.csproj" />
+		<ProjectReference Include="..\WeaponSkin.Shared\WeaponSkin.Shared.csproj" Private="false" ExcludeAssets="runtime" />
 	</ItemGroup>
 </Project>
 

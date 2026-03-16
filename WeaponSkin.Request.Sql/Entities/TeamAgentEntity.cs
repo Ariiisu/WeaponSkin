@@ -7,7 +7,8 @@ namespace WeaponSkin.Request.Sql.Entities;
 /// </summary>
 [SugarTable("ws_team_agents")]
 [SugarIndex($"unique_{{table}}_{nameof(SteamId)}_{nameof(Team)}", 
-    $"{nameof(SteamId)},{nameof(Team)}", OrderByType.Asc, IsUnique = true)]
+    nameof(SteamId), OrderByType.Asc,
+    nameof(Team), OrderByType.Asc, IsUnique = true)]
 public class TeamAgentEntity
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]

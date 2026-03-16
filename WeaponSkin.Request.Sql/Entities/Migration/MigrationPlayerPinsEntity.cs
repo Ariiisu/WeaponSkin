@@ -8,7 +8,8 @@ namespace WeaponSkin.Request.Sql.Entities.Migration;
 /// </summary>
 [SugarTable("wp_player_pins")]
 [SugarIndex($"unique_{{table}}_{nameof(SteamId)}_{nameof(WeaponTeam)}", 
-    $"{nameof(SteamId)},{nameof(WeaponTeam)}", OrderByType.Asc, IsUnique = true)]
+    nameof(SteamId), OrderByType.Asc,
+    nameof(WeaponTeam), OrderByType.Asc, IsUnique = true)]
 public class MigrationPlayerPinsEntity
 {
     [SugarColumn(ColumnName = "steamid", Length = 64, IsNullable = false)]
