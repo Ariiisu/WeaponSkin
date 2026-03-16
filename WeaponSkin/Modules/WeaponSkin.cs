@@ -143,7 +143,7 @@ internal partial class WeaponSkin : IModule
             SetOrAddAttribute(view, "set item texture wear"u8, skin.Wear);
             SetOrAddAttribute(view, "set item texture seed"u8, skin.Seed);
 
-            if (weapon.Slot is GearSlot.Rifle or GearSlot.Pistol && paintKit.IsUseNormalModel)
+            if (weapon.Slot is GearSlot.Rifle or GearSlot.Pistol && paintKit.IsLegacyModel)
             {
                 weapon.SetBodyGroupByName("body", 1);
             }
