@@ -87,14 +87,20 @@ internal class PlayerGloves : IModule
             return nint.Zero;
         }
 
-        var           tokenRefs = server.GetReferencesFromPointer(tokenAddress);
-        HashSet<nint> sets      = [];
+        var                                  tokenRefs = server.GetReferencesFromPointer(tokenAddress);
+        HashSet<(nint @ref, nint funcStart)> sets      = [];
 
-        foreach (var refs in tokenRefs)
+        foreach (var @ref in tokenRefs)
         {
-            if (server.GetFunctionRange(refs, out var start, out _))
+            if (server.GetFunctionRange(@ref, out var start, out _))
             {
-                sets.Add(start);
+                var (isRead, isWritten) = MemoryUtilities.AnalyzeInstructionAccess(@ref);
+
+                // we only care about read only access
+                if (isRead && !isWritten)
+                {
+                    sets.Add((@ref, start));
+                }
             }
         }
 
@@ -105,6 +111,6 @@ internal class PlayerGloves : IModule
             return nint.Zero;
         }
 
-        return sets.First();
+        return sets.First().@ref;
     }
 }
